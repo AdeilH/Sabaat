@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 4.3.2)
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
+
+set(CMAKE_CXX_MODULE_STD ON)
+set(CMAKE_CXX_STANDARD 26)
+
+project(Sabaat)
+set(SABAAT_IMGUI_BACKEND "ALLEGRO5" CACHE STRING "Dear ImGui backend used by Sabaat")
+set_property(CACHE SABAAT_IMGUI_BACKEND PROPERTY STRINGS ALLEGRO5 GLFW3 NONE)
+add_subdirectory(imgui)
+
+if(SABAAT_IMGUI_BACKEND STREQUAL "ALLEGRO5")
+    if(NOT IMGUI_BUILD_ALLEGRO5_BACKEND)
+        message(FATAL_ERROR "SABAAT_IMGUI_BACKEND is ALLEGRO5, but IMGUI_BUILD_ALLEGRO5_BACKEND is OFF")
+    endif()
+
+    add_executable(Sabaat imgui/examples/example_allegro5/main.cpp channels.h)
+    target_compile_features(Sabaat PRIVATE cxx_std_26)
+    target_link_libraries(Sabaat PRIVATE imgui_allegro5)
+elseif(SABAAT_IMGUI_BACKEND STREQUAL "GLFW3")
+    if(NOT IMGUI_BUILD_GLFW3_BACKEND)
+        message(FATAL_ERROR "SABAAT_IMGUI_BACKEND is GLFW3, but IMGUI_BUILD_GLFW3_BACKEND is OFF")
+    endif()
+
+    add_executable(Sabaat main.cpp channels.h)
+    target_compile_features(Sabaat PRIVATE cxx_std_26)
+    target_link_libraries(Sabaat PRIVATE imgui_glfw3)
+elseif(NOT SABAAT_IMGUI_BACKEND STREQUAL "NONE")
+    message(FATAL_ERROR "Unsupported SABAAT_IMGUI_BACKEND '${SABAAT_IMGUI_BACKEND}'. Choose ALLEGRO5, GLFW3 or NONE.")
+endif()
